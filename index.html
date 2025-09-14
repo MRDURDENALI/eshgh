@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سایت عاشقانه ستایش</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap');
+        
+        * {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: twinkle 2s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .moon {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ffd700;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #ffd700; }
+            to { box-shadow: 0 0 30px #ffd700, 0 0 40px #ffd700; }
+        }
+        
+        .heart-beat {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.1); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .day-theme {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1e1b4b 100%);
+        }
+        
+        .night-theme {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        }
+        
+        .message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        
+        .message-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+<body class="min-h-screen transition-all duration-500 day-theme" id="body">
+    <!-- Stars -->
+    <div class="star w-2 h-2" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="star w-3 h-3" style="top: 20%; left: 80%; animation-delay: 0.5s;"></div>
+    <div class="star w-2 h-2" style="top: 30%; left: 10%; animation-delay: 1s;"></div>
+    <div class="star w-3 h-3" style="top: 40%; left: 90%; animation-delay: 1.5s;"></div>
+    <div class="star w-2 h-2" style="top: 60%; left: 15%; animation-delay: 2s;"></div>
+    <div class="star w-3 h-3" style="top: 70%; left: 85%; animation-delay: 0.3s;"></div>
+    <div class="star w-2 h-2" style="top: 80%; left: 25%; animation-delay: 0.8s;"></div>
+    <div class="star w-3 h-3" style="top: 15%; left: 60%; animation-delay: 1.2s;"></div>
+    
+    <!-- Moon -->
+    <div class="moon"></div>
+    
+    <!-- Theme Toggle -->
+    <button onclick="toggleTheme()" class="fixed top-4 left-4 z-50 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-3 hover:bg-opacity-30 transition-all">
+        <svg id="theme-icon" class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+        </svg>
+    </button>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4 floating">
+                    <svg class="w-16 h-16 mx-auto text-pink-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">عاشقتم :)</h1>
+                <p class="text-white text-opacity-80">ورود به دنیای عشق</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">اسم دختر قشنگم</label>
+                    <input type="text" id="username" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="نام را وارد کنید">
+                </div>
+                
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">عددی که عاشقتم</label>
+                    <input type="password" id="password" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="رمز عبور">
+                </div>
+                
+                <button onclick="login()" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-medium hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                        </svg>
+                        ورود با عشق
+                    </span>
+                </button>
+            </div>
+            
+            <div class="text-center mt-6">
+                <p class="text-white text-opacity-60 text-sm">
+                    <span class="inline-block mr-1">🔒</span>
+                    نمونه - Demo
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Page -->
+    <div id="welcomePage" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl p-8 w-full max-w-2xl shadow-2xl text-center">
+            <div class="mb-6 heart-beat">
+                <svg class="w-20 h-20 mx-auto text-pink-300" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-6">ستایش عاشقتممممممم</h1>
+            <p class="text-xl text-white mb-4">بهت افتخار میکنم عشق من</p>
+            <p class="text-xl text-white mb-4">دورت بگردم</p>
+            <p class="text-xl text-white mb-8">الهی تو بهترینی</p>
+            
+            <button onclick="enterSite()" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-xl font-medium hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105 text-lg">
+                سلاپ
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Site -->
+    <div id="mainSite" class="hidden min-h-screen p-4">
+        <!-- Navigation -->
+        <nav class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-4 mb-6 sticky top-4 z-40">
+            <div class="flex justify-center space-x-reverse space-x-8">
+                <button onclick="showSection('heart')" class="nav-btn text-white hover:text-pink-300 transition-all px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <svg class="w-6 h-6 mx-auto mb-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                    </svg>
+                    قلب عشق
+                </button>
+                <button onclick="showSection('poems')" class="nav-btn text-white hover:text-pink-300 transition-all px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <svg class="w-6 h-6 mx-auto mb-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                    </svg>
+                    شعرهای مولوی
+                </button>
+                <button onclick="showSection('letters')" class="nav-btn text-white hover:text-pink-300 transition-all px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <svg class="w-6 h-6 mx-auto mb-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                    </svg>
+                    نامه‌های عاشقانه
+                </button>
+            </div>
+        </nav>
+
+        <!-- Heart Section -->
+        <div id="heartSection" class="section">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-white mb-8">قلب عشق ما</h2>
+                <div class="mb-6">
+                    <button onclick="heartClick()" class="heart-btn hover:scale-110 transition-all duration-300 cursor-pointer bg-gradient-to-r from-pink-500 to-red-500 rounded-full p-8 shadow-2xl">
+                        <svg class="w-24 h-24 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p class="text-white text-lg mb-4">روی قلب کلیک کن عشقم</p>
+                <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                    <p class="text-white text-lg">تعداد کلیک‌های عشق: <span id="clickCount" class="font-bold text-pink-300">0</span></p>
+                    <p class="text-white text-sm mt-2">پیام‌ها ذخیره می‌شوند تا خودت بفرستیشون</p>
+                    <button onclick="showSavedMessages()" class="mt-3 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-all">
+                        مشاهده پیام‌های ذخیره شده
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Poems Section -->
+        <div id="poemsSection" class="section hidden">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-white text-center mb-8">شعر برای دختر کوچولوم</h2>
+                <div class="grid gap-6">
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            عشق آمد و چون خون در رگ‌هایم دوید<br>
+                            خالی کرد مرا و پر از دوست نمود
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            دوست آن نیست که گویی و بگویند<br>
+                            دوست آتش است و در آتش پوید
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            عاشقان را کشته‌ای و زنده کرده‌ای<br>
+                            عاشقان را بی‌خبر از خود کرده‌ای
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            تو که جان جانانی و جانان جان<br>
+                            تو که چشم دیده‌ای و دیده چشم
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            در عشق تو دل من چون شمع می‌سوزد<br>
+                            در فراق تو جان من چون برگ می‌لرزد
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            عشق سلطان است و من بنده‌ی عشق<br>
+                            عشق کوه است و من ذره‌ی عشق
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            چشم تو مست است و دل من شیدا<br>
+                            عشق تو در دل من جای گزیدا
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            در محبت هر که صادق‌تر بود<br>
+                            او ز دیدار حبیب اولی بود
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            عشق چون آتش زند بر خانه‌ای<br>
+                            نه اثر ماند از آن نه نشانه‌ای
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <p class="text-white text-lg leading-relaxed text-center">
+                            تو مرا جان و جهانی ای صنم<br>
+                            بی تو این دل را نباشد مستقر
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Letters Section -->
+        <div id="lettersSection" class="section hidden">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-white text-center mb-8">نامه‌های کوچولو برای ستایش</h2>
+                <div class="grid gap-6">
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه اول</h3>
+                        <p class="text-white leading-relaxed">
+                            ستایش عزیزم، هر روز که چشمامو باز می‌کنم اولین چیزی که به ذهنم میاد تویی. تو نور زندگی منی و بدون تو هیچی معنا نداره. عاشقتم تا ابد
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه دوم</h3>
+                        <p class="text-white leading-relaxed">
+                            چشمای قهوه‌ای تو مثل یه فنجون قهوه گرم تو صبحای سرده. هر بار که نگاهت می‌کنم احساس می‌کنم تو بهشتم. دوستت دارم بیشتر از همه چی
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه سوم</h3>
+                        <p class="text-white leading-relaxed">
+                            ستایش جونم، تو بهترین اتفاق زندگی منی. هر لحظه‌ای که باهات هستم مثل یه رویاست. امیدوارم تا آخر عمر کنار هم باشیم
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه چهارم</h3>
+                        <p class="text-white leading-relaxed">
+                            وقتی می‌خندی انگار که تمام ستاره‌های آسمون یکجا می‌درخشن. خنده‌ت بهترین آهنگ دنیاست برام. هیچوقت نخند نکن عشقم
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه پنجم</h3>
+                        <p class="text-white leading-relaxed">
+                            تو نه فقط دختر دوست‌داشتنی منی، بلکه بهترین دوست و همراه زندگیمم. با تو همه چی راحته و قشنگه. ممنونم که تو زندگی منی
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه ششم</h3>
+                        <p class="text-white leading-relaxed">
+                            هر شب قبل خواب آرزو می‌کنم که فردا هم بتونم چشمای قشنگتو ببینم. تو آرامش منی ستایش. شب‌هات قشنگ، رویاهات شیرین
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه هفتم</h3>
+                        <p class="text-white leading-relaxed">
+                            دستای نرم تو تو دستام انگار که تمام دنیا مال منه. هیچوقت دستمو ول نکن عشقم. باهم تا آخر دنیا
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه هشتم</h3>
+                        <p class="text-white leading-relaxed">
+                            تو مثل یه فرشته‌ای که از آسمون اومده تو زندگیم. هر روز بهت افتخار می‌کنم که تو مال منی. عاشق همه وجودتم
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه نهم</h3>
+                        <p class="text-white leading-relaxed">
+                            صدای قشنگت مثل موسیقی تو گوشمه. وقتی اسممو صدا می‌زنی احساس می‌کنم پرواز می‌کنم. هیچوقت ساکت نشو عزیزم
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-pink-300 mb-3">نامه دهم</h3>
+                        <p class="text-white leading-relaxed">
+                            ستایش عشق من، این آخرین نامه نیست، بلکه شروع هزاران نامه‌ی دیگه‌ست که می‌خوام برات بنویسم. عاشقتم تا ابد و یه روز بیشتر
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Popup -->
+    <div id="messagePopup" class="message-popup">
+        <div class="text-center">
+            <div class="mb-3">
+                <svg class="w-12 h-12 mx-auto text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div id="messageContent">
+                <p id="messageText" class="text-gray-800 font-medium"></p>
+                <button onclick="closeMessage()" class="mt-4 bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition-all">
+                    باشه عشقم
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isNightTheme = false;
+        let clickCount = 0;
+        let currentSection = 'heart';
+        
+        const loveMessages = [
+            "عاشقتم ستایش",
+            "بهت افتخار میکنم عشقم",
+            "دورت بگردم عزیزم",
+            "تو بهترینی دنیا",
+            "عاشق چشمای قهوه‌ایتم",
+            "نور چشمم هستی",
+            "جونم فدات بشه",
+            "تو همه زندگی منی",
+            "بی تو نمی‌تونم زندگی کنم",
+            "تو آرامش منی عشقم",
+            "هر روز بیشتر عاشقتم",
+            "تو رویای من بودی که حقیقت شد",
+            "با تو همه چی قشنگه",
+            "تو مهربونترین آدم دنیایی",
+            "عاشق خنده‌هاتم",
+            "تو انرژی مثبت منی",
+            "بدون تو دنیا بی‌معنیه",
+            "تو قلب منی ستایش",
+            "عاشق صدای قشنگتم",
+            "تو نصف دیگه منی",
+            "با تو احساس کامل بودن می‌کنم",
+            "تو بهترین هدیه زندگیمی",
+            "عاشق لبخند تو هستم",
+            "تو امید منی",
+            "با تو همیشه خوشحالم",
+            "تو عطر زندگی منی",
+            "عاشق مهربونیتم",
+            "تو ستاره‌ی منی",
+            "بدون تو شب‌ها خوابم نمیبره",
+            "تو آینده‌ی منی",
+            "عاشق همه چیت هستم",
+            "تو معجزه‌ی زندگی منی",
+            "با تو دنیا رنگی‌تره",
+            "تو قشنگترین حس دنیایی",
+            "عاشق نگاه کردن بهتم",
+            "تو آرامش بعد از طوفانی",
+            "با تو زمان متوقف میشه",
+            "تو عشق حقیقی منی",
+            "عاشق بودن باهاتم",
+            "تو همه‌ی خوشی‌های منی",
+            "بدون تو رنگ زندگی پریده",
+            "تو نفس کشیدن منی",
+            "عاشق آغوش گرمتم",
+            "تو امنیت منی",
+            "با تو همیشه عاشقم",
+            "تو بهترین اتفاق زندگیمی",
+            "عاشق قدم زدن باهاتم",
+            "تو خورشید زندگی منی",
+            "بدون تو دنیا سرد و تاریکه",
+            "تو تا ابد عشق منی"
+        ];
+
+        function toggleTheme() {
+            const body = document.getElementById('body');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            isNightTheme = !isNightTheme;
+            
+            if (isNightTheme) {
+                body.className = body.className.replace('day-theme', 'night-theme');
+                themeIcon.innerHTML = '<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>';
+            } else {
+                body.className = body.className.replace('night-theme', 'day-theme');
+                themeIcon.innerHTML = '<path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>';
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username.toLowerCase() === 'ستایش' && password === '919') {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('welcomePage').classList.remove('hidden');
+            } else {
+                showMessage('نام کاربری یا رمز عبور اشتباه است!');
+            }
+        }
+
+        function enterSite() {
+            document.getElementById('welcomePage').classList.add('hidden');
+            document.getElementById('mainSite').classList.remove('hidden');
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            
+            currentSection = section;
+        }
+
+        async function heartClick() {
+            clickCount++;
+            document.getElementById('clickCount').textContent = clickCount;
+            
+            // Show random love message
+            const randomMessage = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+            showMessage(randomMessage);
+            
+            // Send to Telegram
+            await sendToTelegram(randomMessage);
+            
+            // Save message locally
+            saveMessage(randomMessage);
+            
+            // Heart animation
+            const heartBtn = document.querySelector('.heart-btn');
+            heartBtn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                heartBtn.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        async function sendToTelegram(message) {
+            const botToken = '8020496594:AAHCwRnlQp4xeDvO0o99DfeOKXHGy3AfzTc';
+            const chatId = '7679342090';
+            
+            const fullMessage = `💕 ${message} 💕
+
+🌹 ارسال شده از سایت عاشقانه با عشق 🌹
+⏰ ${new Date().toLocaleString('fa-IR')}
+🔢 کلیک شماره: ${clickCount}`;
+
+            // Method 1: Direct API call (works on GitHub Pages)
+            try {
+                const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                
+                const response = await fetch(telegramUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: fullMessage,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    console.log('✅ پیام با موفقیت به تلگرام ستایش ارسال شد!');
+                    return true;
+                } else {
+                    console.log('❌ خطا در ارسال:', result.description);
+                }
+            } catch (error) {
+                console.log('❌ خطا در اتصال:', error);
+            }
+            
+            // Method 2: Using JSONP for CORS bypass
+            try {
+                const script = document.createElement('script');
+                const callbackName = 'telegramCallback' + Date.now();
+                
+                window[callbackName] = function(data) {
+                    console.log('✅ پیام از طریق JSONP ارسال شد!');
+                    document.head.removeChild(script);
+                    delete window[callbackName];
+                };
+                
+                const params = new URLSearchParams({
+                    chat_id: chatId,
+                    text: fullMessage,
+                    callback: callbackName
+                });
+                
+                script.src = `https://api.telegram.org/bot${botToken}/sendMessage?${params}`;
+                document.head.appendChild(script);
+                
+                return true;
+            } catch (error) {
+                console.log('❌ خطا در روش JSONP:', error);
+            }
+            
+            return false;
+        }
+
+        function saveMessage(message) {
+            const timestamp = new Date().toLocaleString('fa-IR');
+            const fullMessage = `💕 ${message} 💕\n🌹 ارسال شده از سایت عاشقانه با عشق 🌹\n⏰ ${timestamp}`;
+            
+            // Get existing messages or create empty array
+            let savedMessages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+            
+            // Add new message
+            savedMessages.push({
+                message: message,
+                fullMessage: fullMessage,
+                timestamp: timestamp,
+                clickNumber: clickCount
+            });
+            
+            // Keep only last 50 messages
+            if (savedMessages.length > 50) {
+                savedMessages = savedMessages.slice(-50);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('loveMessages', JSON.stringify(savedMessages));
+            
+            console.log(`💕 پیام ذخیره شد: ${message}`);
+            console.log(`📱 برای ارسال به تلگرام ستایش:`);
+            console.log(fullMessage);
+        }
+
+        function showSavedMessages() {
+            const savedMessages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+            
+            if (savedMessages.length === 0) {
+                showMessage('هنوز هیچ پیامی ذخیره نشده! روی قلب کلیک کن عشقم 💕');
+                return;
+            }
+            
+            let content = '<div class="text-right max-h-96 overflow-y-auto">';
+            content += '<h3 class="text-lg font-bold text-gray-800 mb-4 text-center">پیام‌های عاشقانه ذخیره شده</h3>';
+            
+            // Show last 10 messages
+            const recentMessages = savedMessages.slice(-10).reverse();
+            
+            recentMessages.forEach((msg, index) => {
+                content += `
+                    <div class="bg-pink-50 p-3 rounded-lg mb-3 border-r-4 border-pink-300">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">کلیک #${msg.clickNumber}</span>
+                            <span class="text-xs text-gray-500">${msg.timestamp}</span>
+                        </div>
+                        <p class="text-gray-800 font-medium">${msg.message}</p>
+                        <button onclick="copyMessage('${msg.fullMessage.replace(/'/g, "\\'")}', ${index})" 
+                                class="mt-2 text-xs bg-pink-500 text-white px-2 py-1 rounded hover:bg-pink-600 transition-all">
+                            کپی برای تلگرام
+                        </button>
+                    </div>
+                `;
+            });
+            
+            content += '</div>';
+            content += `
+                <div class="text-center mt-4">
+                    <p class="text-sm text-gray-600 mb-3">مجموع پیام‌ها: ${savedMessages.length}</p>
+                    <button onclick="clearMessages()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all mr-2">
+                        پاک کردن همه
+                    </button>
+                    <button onclick="closeMessage()" class="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-all">
+                        بستن
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('messageContent').innerHTML = content;
+            document.getElementById('messagePopup').classList.add('show');
+        }
+
+        function copyMessage(message, index) {
+            navigator.clipboard.writeText(message).then(() => {
+                // Show temporary success message
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'کپی شد! ✓';
+                button.classList.add('bg-green-500');
+                button.classList.remove('bg-pink-500');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('bg-green-500');
+                    button.classList.add('bg-pink-500');
+                }, 2000);
+            }).catch(() => {
+                showMessage('خطا در کپی کردن! متن رو دستی انتخاب کن');
+            });
+        }
+
+        function clearMessages() {
+            if (confirm('مطمئنی می‌خوای همه پیام‌ها رو پاک کنی؟')) {
+                localStorage.removeItem('loveMessages');
+                showMessage('همه پیام‌ها پاک شدند! 🗑️');
+            }
+        }
+
+        function showMessage(message) {
+            const popup = document.getElementById('messagePopup');
+            const messageText = document.getElementById('messageText');
+            const messageContent = document.getElementById('messageContent');
+            
+            // Reset to simple message format
+            messageContent.innerHTML = `
+                <p id="messageText" class="text-gray-800 font-medium">${message}</p>
+                <button onclick="closeMessage()" class="mt-4 bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition-all">
+                    باشه عشقم
+                </button>
+            `;
+            
+            popup.classList.add('show');
+        }
+
+        function closeMessage() {
+            document.getElementById('messagePopup').classList.remove('show');
+        }
+
+        // Allow Enter key for login
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('loginPage').classList.contains('hidden')) {
+                login();
+            }
+        });
+
+        // Close message popup when clicking outside
+        document.getElementById('messagePopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMessage();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97f1fd1cd40ca02e',t:'MTc1Nzg3NDk3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
